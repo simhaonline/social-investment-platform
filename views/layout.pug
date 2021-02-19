@@ -7,14 +7,16 @@ html
     meta(name='theme-color' content='#4DA5F4')
     meta(name='csrf-token', content=_csrf)
     title #{title} - Hackathon Starter
-    link(rel='shortcut icon', href='/favicon.png')
+    link(rel='shortcut icon', href='/logo.svg')
     link(rel='stylesheet', href='/css/main.css')
+    script(src='https://cdn.jsdelivr.net/npm/typed.js@2.0.11')
+    
     block head
 
   body
     include partials/header
 
-    .container
+    .container-fluid
       include partials/flash
       block content
 
