@@ -1,0 +1,37 @@
+extends ./layout
+
+block content
+ .container-fluid.row
+  .col-md-3
+  .col-md-6.mt-10
+   form#login(method='POST')
+    h1 التقديم على الدعم
+    br
+    input(type='hidden', name='_csrf', value=_csrf)
+    .form-group.row
+      .col-md-3
+      .col-md-6
+        input.form-control(type='text', name='email', id='email', placeholder='نوع الدعم', autofocus, required)
+      .col-md-3
+ 
+    .form-group.row
+      .col-md-3
+      .col-md-6
+        input.form-control(type='text', name='password', id='password', placeholder=' وصف الدعم', required)
+      .col-md-3
+    .form-group.row
+      .col-md-3
+      .col-md-6
+        input.form-control(type='text', name='password', id='password', placeholder=' الشروط والملاحظات', required)
+      .col-md-3
+
+    .form-group.row
+      .col-md-3
+      .col-md-6
+        a.btn.btn-block.btn-primary#loginBTN(href="/providerDashboard")
+          | إرسال
+      .col-md-3
+
+  .col-md-3
+
+  

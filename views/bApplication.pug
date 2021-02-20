@@ -1,0 +1,46 @@
+extends ./layout
+
+block content
+ .container-fluid.row
+  .col-md-3
+  .col-md-6.mt-10
+   form#login(method='POST')
+    h1 التقديم على المنحة
+    br
+    input(type='hidden', name='_csrf', value=_csrf)
+    .form-group.row
+      .col-md-3
+      .col-md-6
+        input.form-control(type='text', name='email', id='email', placeholder='اسم المشروع', autofocus, required)
+      .col-md-3
+    .form-group.row
+      .col-md-3
+      .col-md-6
+        input.form-control(type='text', name='password', id='password', placeholder='اسم المسؤول عن المشروع', required)
+      .col-md-3
+    .form-group.row
+      .col-md-3
+      .col-md-6
+        input.form-control(type='text', name='password', id='password', placeholder='منطقة المشروع الجغرافية', required)
+      .col-md-3
+    .form-group.row
+      .col-md-3
+      .col-md-6
+        input.form-control(type='text', name='password', id='password', placeholder=' الفئة المستهدفة بالعمل الخيري', required)
+      .col-md-3
+    .form-group.row
+      .col-md-3
+      .col-md-6
+        input.form-control(type='text', name='password', id='password', placeholder='نبذة عن المشروع وطريقة استغلال الدعم', required)
+      .col-md-3
+
+    .form-group.row
+      .col-md-3
+      .col-md-6
+        a.btn.btn-block.btn-primary#loginBTN(href="/beneficiaryDashboard")
+          | إرسال
+      .col-md-3
+
+  .col-md-3
+
+  

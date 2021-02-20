@@ -1,0 +1,20 @@
+extends ./layout
+
+block content
+ .container-fluid.row
+  .col-md-3
+  .col-md-6.mt-10
+   form#login(method='POST')
+    h1 إنشاء حساب 
+    br
+    input(type='hidden', name='_csrf', value=_csrf)
+    .form-group.row
+      .col-md-1
+      .col-md-4
+        a.switch-login-btn(href="/providerSignup") مانح
+      .col-md-2
+      .col-md-4
+         a.switch-login-btn(href="/beneficiarySignup") مستفيد
+      .col-md-1
+    
+  

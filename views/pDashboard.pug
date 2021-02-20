@@ -1,0 +1,191 @@
+extends ./layout
+
+block content
+ .container-fluid#dashContainer
+
+   .row
+     .col-md-2
+     .col-md-2
+     .col-md-2
+     .col-md-2
+       a.dash-buttons(href="/providerProfile")  الملف الشخصي
+     .col-md-2
+       a.dash-buttons(href="/offer") تقديم منحة
+     .col-md-2
+   .row
+     .col-md-2
+     .col-md-8
+       hr
+     .col-md-2
+   .row
+     h1.dashtitle المنح الخاصة بي
+   .row
+     .col-md-2
+     .col-md-3
+       .causes-item.causes-item--primary
+        .causes-item__body
+          .causes-item__top
+             .causes-item__img
+              img.img--bg(style="margin-bottom: 9px; margin-top: 9px" src="jarir.png", alt="img" width="100%")
+             
+             h6.causes-item__title 
+              a(href="cause-details.html") ٢٠ حاسب محمول
+             p نرغب بالتبرع ب٢٠ حاسب آلي من نوع Dell Latitude 3410 Intel Core i7
+          .causes-item__lower
+            .progress-bar
+              .progress-bar__inner(style="width: 50%;")
+                .progress-bar__value 50%
+            .causes-item__details-holder
+              .causes-item__details-item
+                 span الهدف:
+                 span ٢٠ جهاز
+              .causes-item__details-item.text-right
+                 span المتبرع به: 
+                 span ١٠ جهاز
+            .causes-item__img
+             a.causes-item__badge(style="background-color: #F2B705", href="/viewOffer") المزيد
+             br
+             //img.img--bg(src="img/causes_1.jpg", alt="img")
+     .col-md-3
+       .causes-item.causes-item--primary
+        .causes-item__body
+          .causes-item__top
+             .causes-item__img
+              img.img--bg(style="margin-bottom: 9px; margin-top: 9px" src="jarir.png", alt="img" width="100%")
+             
+             h6.causes-item__title 
+              a(href="cause-details.html") ٣٠٠ ألف ريال  
+             p نرغب بدعم عمل خيري يخدم الأسر المنتجة في المللكة بمبلغ ٣٠٠٠٠٠   
+          .causes-item__lower
+            .progress-bar
+              .progress-bar__inner(style="width: 0%;")
+                .progress-bar__value 0%
+            .causes-item__details-holder
+              .causes-item__details-item
+                 span الهدف:
+                 span ٣٠٠ ألف  
+              .causes-item__details-item.text-right
+                 span المتبرع به: 
+                 span ٠ ريال 
+            .causes-item__img
+             a.causes-item__badge(style="background-color: #F2B705", href="/viewOffer") المزيد
+             br
+             //img.img--bg(src="img/causes_1.jpg", alt="img")
+     .col-md-3
+       .causes-item.causes-item--primary
+        .causes-item__body
+          .causes-item__top
+             .causes-item__img
+              img.img--bg(style="margin-bottom: 9px; margin-top: 9px" src="jarir.png", alt="img" width="100%")
+             
+             h6.causes-item__title 
+              a(href="cause-details.html") ٤٠٠ حقيبة مدرسية
+             p نرغب بالتبرع ب٤٠٠ حقيبة مدرسية للأطفال من عمر ٦ ل١٣ سنة
+          .causes-item__lower
+            .progress-bar
+              .progress-bar__inner(style="width: 90%;")
+                .progress-bar__value 90%
+            .causes-item__details-holder
+              .causes-item__details-item
+                 span الهدف:
+                 span ٤٠٠ 
+              .causes-item__details-item.text-right
+                 span المتبرع به: 
+                 span  ٣٦٠ 
+            .causes-item__img
+             a.causes-item__badge(style="background-color: #F2B705", href="/viewOffer") المزيد
+             br
+             //img.img--bg(src="img/causes_1.jpg", alt="img")
+     .col-md-2
+   .row
+     .col-md-2
+     .col-md-8
+       hr
+     .col-md-2
+   .row
+     h1.dashtitle تصفح طلبات الدعم
+   .row
+     .col-md-2
+     .col-md-8
+       form.form-inline
+         input.form-control.mr-sm-2(type='search' placeholder='البحث' aria-label='البحث')
+         button.btn.btn-outline-warning.my-2.my-sm-0(type='submit') ابحث
+         br
+         br
+     .col-md-2
+   br
+   br
+   .row
+     .col-md-2
+     .col-md-3
+       .causes-item.causes-item--primary
+        .causes-item__body
+          .causes-item__top
+             .causes-item__img
+              img.img--bg(style="margin-bottom: 9px; margin-top: 9px" src="mishkah.png", alt="img" width="100%")
+             h6.causes-item__title 
+              a(href="cause-details.html") ٦٠ حاسب محمول
+             p نرغب بتوفير ٦٠ حاسب آلي لتعليم وتأهيل ٦٠ شاب 
+          .causes-item__lower
+            .progress-bar
+              .progress-bar__inner(style="width: 20%;")
+                .progress-bar__value 20%
+            .causes-item__details-holder
+              .causes-item__details-item
+                 span الهدف:
+                 span ٦٠ جهاز
+              .causes-item__details-item.text-right
+                 span المتبرع به: 
+                 span ١٦ جهاز
+            .causes-item__img
+             a.causes-item__badge(style="background-color: #F2B705", href="/viewRequest") المزيد
+             br
+             //img.img--bg(src="img/causes_1.jpg", alt="img")
+     .col-md-3
+       .causes-item.causes-item--primary
+        .causes-item__body
+          .causes-item__top
+             .causes-item__img
+              img.img--bg(style="margin-bottom: 9px; margin-top: 9px" src="e7twa.jpg", alt="img" width="100%")
+             h6.causes-item__title 
+              a(href="cause-details.html") ٢٠٠ توصيل داخل الرياض 
+             p نرغب بتوصيل ٢٠٠ تبرع ملابس داخل الرياض   
+          .causes-item__lower
+            .progress-bar
+              .progress-bar__inner(style="width: 50%;")
+                .progress-bar__value 50%
+            .causes-item__details-holder
+              .causes-item__details-item
+                 span الهدف:
+                 span ٢٠٠   
+              .causes-item__details-item.text-right
+                 span المتبرع به: 
+                 span ١٠ توصيل 
+            .causes-item__img
+              a.causes-item__badge(style="background-color: #F2B705", href="/viewRequest") المزيد
+            
+     .col-md-3
+       .causes-item.causes-item--primary
+        .causes-item__body
+          .causes-item__top
+             .causes-item__img
+              img.img--bg(style="margin-bottom: 9px; margin-top: 9px" src="konSadiky.jpg", alt="img" width="100%")
+             h6.causes-item__title 
+              a(href="cause-details.html") ٤٠٠ حقيبة مدرسية
+             p نرغب بالحصول على ٣٠٠ حقيبة مدرسية للأطفال من عمر ٦ ل١٣ سنة
+          .causes-item__lower
+            .progress-bar
+              .progress-bar__inner(style="width: 12%;")
+                .progress-bar__value 12%
+            .causes-item__details-holder
+              .causes-item__details-item
+                 span المتبقي:
+                 span ٣٢٠ 
+              .causes-item__details-item.text-right
+                 span المكتمل: 
+                 span  ٨٠ 
+            .causes-item__img
+             a.causes-item__badge(style="background-color: #F2B705", href="/viewRequest") المزيد
+             br
+             //img.img--bg(src="img/causes_1.jpg", alt="img")
+     .col-md-2

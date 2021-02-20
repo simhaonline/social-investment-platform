@@ -6,6 +6,7 @@ const passport = require('passport');
 const _ = require('lodash');
 const validator = require('validator');
 const mailChecker = require('mailchecker');
+const { userInfo } = require('os');
 const User = require('../models/User');
 
 const randomBytesAsync = promisify(crypto.randomBytes);
@@ -54,12 +55,25 @@ const sendMail = (settings) => {
  * GET /login
  * Login page.
  */
-exports.getLogin = (req, res) => {
+exports.getPLogin = (req, res) => {
   if (req.user) {
-    return res.redirect('/');
+    if (req.user.isProvider) {
+      return res.redirect('/providerDashboard');
+    } return res.redirect('/beneficiaryDashboard');
   }
-  res.render('account/login', {
-    title: 'Login'
+  res.render('pLogin', {
+    title: 'تسجيل دخول المانح'
+  });
+};
+
+exports.getBLogin = (req, res) => {
+  if (req.user) {
+    if (req.user.isProvider) {
+      return res.redirect('/providerDashboard');
+    } return res.redirect('/beneficiaryDashboard');
+  }
+  res.render('bLogin', {
+    title: 'تسجيل دخول المستفيد'
   });
 };
 
@@ -69,12 +83,12 @@ exports.getLogin = (req, res) => {
  */
 exports.postLogin = (req, res, next) => {
   const validationErrors = [];
-  if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' });
-  if (validator.isEmpty(req.body.password)) validationErrors.push({ msg: 'Password cannot be blank.' });
+  if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'الرجاء إدخال بريد إلكتروني صالح' });
+  if (validator.isEmpty(req.body.password)) validationErrors.push({ msg: 'الرجاء إدخال كلمة المرور' });
 
   if (validationErrors.length) {
     req.flash('errors', validationErrors);
-    return res.redirect('/login');
+    return res.redirect(req.get('referer'));
   }
   req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false });
 
@@ -82,12 +96,13 @@ exports.postLogin = (req, res, next) => {
     if (err) { return next(err); }
     if (!user) {
       req.flash('errors', info);
-      return res.redirect('/login');
+      return res.redirect(req.get('referer'));
     }
     req.logIn(user, (err) => {
       if (err) { return next(err); }
-      req.flash('success', { msg: 'Success! You are logged in.' });
-      res.redirect(req.session.returnTo || '/');
+      req.flash('success', { msg: 'Success! You are logged in' });
+      if (user.isProvider) { res.redirect('/providerDashboard'); }
+      res.redirect('/beneficiaryDashboard');
     });
   })(req, res, next);
 };
@@ -109,12 +124,36 @@ exports.logout = (req, res) => {
  * GET /signup
  * Signup page.
  */
-exports.getSignup = (req, res) => {
+exports.getSignupSwitch = (req, res) => {
   if (req.user) {
-    return res.redirect('/');
+    if (req.user.isProvider) {
+      return res.redirect('/providerDashboard');
+    } return res.redirect('/beneficiaryDashboard');
   }
-  res.render('account/signup', {
-    title: 'Create Account'
+  res.render('registerSwitch', {
+    title: 'إنشاء حساب'
+  });
+};
+
+exports.getPSignup = (req, res) => {
+  if (req.user) {
+    if (req.user.isProvider) {
+      return res.redirect('/providerDashboard');
+    } return res.redirect('/beneficiaryDashboard');
+  }
+  res.render('pRegister', {
+    title: 'إنشاء حساب مانح'
+  });
+};
+
+exports.getBSignup = (req, res) => {
+  if (req.user) {
+    if (req.user.isProvider) {
+      return res.redirect('/providerDashboard');
+    } return res.redirect('/beneficiaryDashboard');
+  }
+  res.render('bRegister', {
+    title: 'إنشاء حساب مستفيد'
   });
 };
 
@@ -122,28 +161,30 @@ exports.getSignup = (req, res) => {
  * POST /signup
  * Create a new local account.
  */
-exports.postSignup = (req, res, next) => {
+exports.postPSignup = (req, res, next) => {
   const validationErrors = [];
-  if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'Please enter a valid email address.' });
-  if (!validator.isLength(req.body.password, { min: 8 })) validationErrors.push({ msg: 'Password must be at least 8 characters long' });
-  if (req.body.password !== req.body.confirmPassword) validationErrors.push({ msg: 'Passwords do not match' });
+  if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'الرجاء إدخال بريد صالح' });
+  if (!validator.isLength(req.body.password, { min: 8 })) validationErrors.push({ msg: 'كلمة المرور يجب أن تتكون من ٨ خانات' });
+  if (req.body.password !== req.body.confirmPassword) validationErrors.push({ msg: 'الرجاء مطابقة كلمات المرور' });
 
   if (validationErrors.length) {
     req.flash('errors', validationErrors);
-    return res.redirect('/signup');
+    return res.redirect('/providerSignup');
   }
   req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false });
 
   const user = new User({
     email: req.body.email,
-    password: req.body.password
+    password: req.body.password,
+    isProvider: true,
   });
 
   User.findOne({ email: req.body.email }, (err, existingUser) => {
     if (err) { return next(err); }
     if (existingUser) {
-      req.flash('errors', { msg: 'Account with that email address already exists.' });
-      return res.redirect('/signup');
+      req.flash('errors', { msg: 'البريد الإلكتروني مستعمل مسبقًا' });
+
+      return res.redirect('/providerSignup');
     }
     user.save((err) => {
       if (err) { return next(err); }
@@ -151,12 +192,48 @@ exports.postSignup = (req, res, next) => {
         if (err) {
           return next(err);
         }
-        res.redirect('/');
+        res.redirect('/providerDashboard');
       });
     });
   });
 };
 
+exports.postBSignup = (req, res, next) => {
+  const validationErrors = [];
+  if (!validator.isEmail(req.body.email)) validationErrors.push({ msg: 'الرجاء إدخال بريد صالح' });
+  if (!validator.isLength(req.body.password, { min: 8 })) validationErrors.push({ msg: 'كلمة المرور يجب أن تتكون من ٨ خانات' });
+  if (req.body.password !== req.body.confirmPassword) validationErrors.push({ msg: 'الرجاء مطابقة كلمات المرور' });
+
+  if (validationErrors.length) {
+    req.flash('errors', validationErrors);
+    return res.redirect('/beneficiarySignup');
+  }
+  req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false });
+
+  const user = new User({
+    email: req.body.email,
+    password: req.body.password,
+    isProvider: false,
+  });
+
+  User.findOne({ email: req.body.email }, (err, existingUser) => {
+    if (err) { return next(err); }
+    if (existingUser) {
+      req.flash('errors', { msg: 'البريد الإلكتروني مستعمل مسبقًا' });
+
+      return res.redirect('/beneficiarySignup');
+    }
+    user.save((err) => {
+      if (err) { return next(err); }
+      req.logIn(user, (err) => {
+        if (err) {
+          return next(err);
+        }
+        res.redirect('/beneficiaryDashboard');
+      });
+    });
+  });
+};
 /**
  * GET /account
  * Profile page.
@@ -189,6 +266,7 @@ exports.postUpdateProfile = (req, res, next) => {
     user.profile.gender = req.body.gender || '';
     user.profile.location = req.body.location || '';
     user.profile.website = req.body.website || '';
+    
     user.save((err) => {
       if (err) {
         if (err.code === 11000) {

@@ -1,11 +1,11 @@
-extends ../layout
+extends ./layout
 
 block content
  .container-fluid.row
   .col-md-3
   .col-md-6.mt-10
    form#login(method='POST')
-    h1 تسجيل الدخول
+    h1 تسجيل دخول المانح
     br
     input(type='hidden', name='_csrf', value=_csrf)
     .form-group.row
@@ -26,17 +26,18 @@ block content
           | تسجيل الدخول
       .col-md-3
     .form-group.row
-     .offset-md-3.col-md-7.pl-4
+     .col-md-5
+     .col-md-5
         a.btn.btn-link(href='/forgot')#forgot هل نسيت كلمة المرور؟
+     .col-md-2
     .form-group
       .offset-md-3.col-md-6.pl-2
         hr
-    .form-group
-      .col-md-3
+    .form-group.row
+      .col-md-2
       .col-md-6#nafath
         a(href='https://www.iam.gov.sa/authservice//userauthservice?lang=ar')  الدخول من خلال النفاذ الوطني الموحد
         img(src="absher.png", alt="absher", width="40px") 
-      .col-md-3
   .col-md-3
 
   

@@ -45,7 +45,7 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, don
       if (isMatch) {
         return done(null, user);
       }
-      return done(null, false, { msg: 'Invalid email or password.' });
+      return done(null, false, { msg: 'البريد الإلكتروني أو كلمة المرور خاطئة' });
     });
   });
 }));

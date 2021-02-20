@@ -1,65 +1,91 @@
+"use strict";
+
 /**
  * Module dependencies.
  */
-const express = require('express');
-const compression = require('compression');
-const session = require('express-session');
-const bodyParser = require('body-parser');
-const logger = require('morgan');
-const chalk = require('chalk');
-const errorHandler = require('errorhandler');
-const lusca = require('lusca');
-const dotenv = require('dotenv');
-const MongoStore = require('connect-mongo')(session);
-const flash = require('express-flash');
-const path = require('path');
-const mongoose = require('mongoose');
-const passport = require('passport');
-const sass = require('node-sass-middleware');
-const multer = require('multer');
+var express = require('express');
 
-const upload = multer({ dest: path.join(__dirname, 'uploads') });
+var compression = require('compression');
 
+var session = require('express-session');
+
+var bodyParser = require('body-parser');
+
+var logger = require('morgan');
+
+var chalk = require('chalk');
+
+var errorHandler = require('errorhandler');
+
+var lusca = require('lusca');
+
+var dotenv = require('dotenv');
+
+var MongoStore = require('connect-mongo')(session);
+
+var flash = require('express-flash');
+
+var path = require('path');
+
+var mongoose = require('mongoose');
+
+var passport = require('passport');
+
+var sass = require('node-sass-middleware');
+
+var multer = require('multer');
+
+var upload = multer({
+  dest: path.join(__dirname, 'uploads')
+});
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
-dotenv.config({ path: '.env.example' });
 
+dotenv.config({
+  path: '.env.example'
+});
 /**
  * Controllers (route handlers).
  */
-const homeController = require('./controllers/home');
-const userController = require('./controllers/user');
-const apiController = require('./controllers/api');
-const contactController = require('./controllers/contact');
 
+var homeController = require('./controllers/home');
+
+var userController = require('./controllers/user');
+
+var apiController = require('./controllers/api');
+
+var contactController = require('./controllers/contact');
 /**
  * API keys and Passport configuration.
  */
-const passportConfig = require('./config/passport');
 
+
+var passportConfig = require('./config/passport');
 /**
  * Create Express server.
  */
-const app = express();
 
+
+var app = express();
 /**
  * Connect to MongoDB.
  */
+
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useUnifiedTopology', true);
 mongoose.connect(process.env.MONGODB_URI);
-mongoose.connection.on('error', (err) => {
+mongoose.connection.on('error', function (err) {
   console.error(err);
   console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
   process.exit();
 });
-
 /**
  * Express configuration.
  */
+
 app.set('host', process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
 app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080);
 app.set('views', path.join(__dirname, 'views'));
@@ -71,21 +97,26 @@ app.use(sass({
 }));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(session({
   resave: true,
   saveUninitialized: true,
   secret: process.env.SESSION_SECRET,
-  cookie: { maxAge: 1209600000 }, // two weeks in milliseconds
+  cookie: {
+    maxAge: 1209600000
+  },
+  // two weeks in milliseconds
   store: new MongoStore({
     url: process.env.MONGODB_URI,
-    autoReconnect: true,
+    autoReconnect: true
   })
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
-app.use((req, res, next) => {
+app.use(function (req, res, next) {
   if (req.path === '/api/upload') {
     // Multer multipart/form-data handling needs to occur before the Lusca CSRF check.
     next();
@@ -96,39 +127,46 @@ app.use((req, res, next) => {
 app.use(lusca.xframe('SAMEORIGIN'));
 app.use(lusca.xssProtection(true));
 app.disable('x-powered-by');
-app.use((req, res, next) => {
+app.use(function (req, res, next) {
   res.locals.user = req.user;
   next();
 });
-app.use((req, res, next) => {
+app.use(function (req, res, next) {
   // After successful login, redirect back to the intended page
-  if (!req.user
-    && req.path !== '/login'
-    && req.path !== '/signup'
-    && !req.path.match(/^\/auth/)
-    && !req.path.match(/\./)) {
+  if (!req.user && req.path !== '/login' && req.path !== '/signup' && !req.path.match(/^\/auth/) && !req.path.match(/\./)) {
     req.session.returnTo = req.originalUrl;
-  } else if (req.user
-    && (req.path === '/account' || req.path.match(/^\/api/))) {
+  } else if (req.user && (req.path === '/account' || req.path.match(/^\/api/))) {
     req.session.returnTo = req.originalUrl;
   }
+
   next();
 });
-app.use('/', express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/chart.js/dist'), { maxAge: 31557600000 }));
-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/popper.js/dist/umd'), { maxAge: 31557600000 }));
-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), { maxAge: 31557600000 }));
-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/jquery/dist'), { maxAge: 31557600000 }));
-app.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
-
+app.use('/', express["static"](path.join(__dirname, 'public'), {
+  maxAge: 31557600000
+}));
+app.use('/js/lib', express["static"](path.join(__dirname, 'node_modules/chart.js/dist'), {
+  maxAge: 31557600000
+}));
+app.use('/js/lib', express["static"](path.join(__dirname, 'node_modules/popper.js/dist/umd'), {
+  maxAge: 31557600000
+}));
+app.use('/js/lib', express["static"](path.join(__dirname, 'node_modules/bootstrap/dist/js'), {
+  maxAge: 31557600000
+}));
+app.use('/js/lib', express["static"](path.join(__dirname, 'node_modules/jquery/dist'), {
+  maxAge: 31557600000
+}));
+app.use('/webfonts', express["static"](path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), {
+  maxAge: 31557600000
+}));
 /**
  * Primary app routes.
  */
 // app.get('/', homeController.index);
 // app.get('/login', userController.getLogin);
 // app.post('/login', userController.postLogin);
- app.get('/logout', userController.logout);
-// app.get('/forgot', userController.getForgot);
+
+app.get('/logout', userController.logout); // app.get('/forgot', userController.getForgot);
 // app.post('/forgot', userController.postForgot);
 // app.get('/reset/:token', userController.getReset);
 // app.post('/reset/:token', userController.postReset);
@@ -143,43 +181,62 @@ app.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawes
 // app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
 // app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 // app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
-
 // toor
+
 app.get('/', homeController.index); // root (1) view✅ controller✅
 // login
+
 app.get('/login', homeController.loginSwitch); // switch (2) controller✅ view✅ 
+
 app.get('/providerLogin', userController.getPLogin); // P login (3) controller✅ view✅ 
+
 app.post('/providerLogin', userController.postLogin); // controller✅ 
+
 app.get('/beneficiaryLogin', userController.getBLogin); // G login (4) controller✅ view✅ 
+
 app.post('/beneficiaryLogin', userController.postLogin); // controller✅
 // register
+
 app.get('/signup', userController.getSignupSwitch); // switch (5) controller✅ view✅ 
+
 app.get('/providerSignup', userController.getPSignup); // P signup (6) controller✅ view✅ 
+
 app.post('/providerSignup', userController.postPSignup);
 app.get('/beneficiarySignup', userController.getBSignup); // G signup (7) controller✅ view✅ 
-app.post('/beneficiarySignup', userController.postBSignup);
-// Dashboard
+
+app.post('/beneficiarySignup', userController.postBSignup); // Dashboard
+
 app.get('/providerDashboard', homeController.pDash); // (8) controller✅
+
 app.get('/beneficiaryDashboard', homeController.bDash); // (9) controller✅
 // Profile
+
 app.get('/providerProfile', homeController.pProfile); // (10) controller✅
+
 app.get('/beneficiaryProfile', homeController.bProfile); // (11) controller✅
 // offer
+
 app.get('/viewOffer', homeController.viewOffer); // (12) view controller✅
+
 app.get('/addOffer', homeController.offerForm); // (13) form controller✅
+
 app.post('/offer', homeController.postOffer); // controller✅
 // request
+
 app.get('/viewRequest', homeController.viewRequest); // (14) view controller✅
+
 app.get('/request/', homeController.reqForm); // (15) form controller✅
+
 app.post('/request', homeController.postReq); // controller✅
 // giver application
-app.get('/offerApplication', homeController.OfferApp); // (16)
-app.post('/offer/:id/application', homeController.postOfferApp);
-// provider application
-app.get('/requestApplication', homeController.reqApp); // (17)
-app.post('/request/:id/application', homeController.postReqApp);
 
-// [sys-log] 19Feb 2021 - 23:40:32: Warning.. high exhaustion at Universe://earth/humans/lamees.soul
+app.get('/offerApplication', homeController.OfferApp); // (16)
+
+app.post('/offer/:id/application', homeController.postOfferApp); // provider application
+
+app.get('/requestApplication', homeController.reqApp); // (17)
+
+app.post('/request/:id/application', homeController.postReqApp); // [sys-log] 19Feb 2021 - 23:40:32: Warning.. high exhaustion at Universe://earth/humans/lamees.soul
 
 /**
  * API examples routes.
@@ -216,6 +273,7 @@ app.post('/request/:id/application', homeController.postReqApp);
 // app.get('/api/google/sheets', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getGoogleSheets);
 // app.get('/api/quickbooks', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getQuickbooks);
 // 
+
 /**
  * OAuth authentication routes. (Sign in)
  */
@@ -279,22 +337,23 @@ app.post('/request/:id/application', homeController.postReqApp);
 /**
  * Error Handler.
  */
+
 if (process.env.NODE_ENV === 'development') {
   // only use in development
   app.use(errorHandler());
 } else {
-  app.use((err, req, res, next) => {
+  app.use(function (err, req, res, next) {
     console.error(err);
     res.status(500).send('Server Error');
   });
 }
-
 /**
  * Start Express server.
  */
-app.listen(app.get('port'), () => {
+
+
+app.listen(app.get('port'), function () {
   console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), app.get('port'), app.get('env'));
   console.log('  Press CTRL-C to stop\n');
 });
-
 module.exports = app;

@@ -17,6 +17,9 @@ var validator = require('validator');
 
 var mailChecker = require('mailchecker');
 
+var _require2 = require('os'),
+    userInfo = _require2.userInfo;
+
 var User = require('../models/User');
 
 var randomBytesAsync = promisify(crypto.randomBytes);
@@ -71,14 +74,31 @@ var sendMail = function sendMail(settings) {
  */
 
 
-exports.getLogin = function (req, res) {
+exports.getPLogin = function (req, res) {
   if (req.user) {
-    return res.redirect('/');
-  } // return res.jsonp({"lamees":"oak"});
+    if (req.user.isProvider) {
+      return res.redirect('/providerDashboard');
+    }
 
+    return res.redirect('/beneficiaryDashboard');
+  }
 
-  res.render('account/login', {
-    title: 'Login'
+  res.render('pLogin', {
+    title: 'تسجيل دخول المانح'
+  });
+};
+
+exports.getBLogin = function (req, res) {
+  if (req.user) {
+    if (req.user.isProvider) {
+      return res.redirect('/providerDashboard');
+    }
+
+    return res.redirect('/beneficiaryDashboard');
+  }
+
+  res.render('bLogin', {
+    title: 'تسجيل دخول المستفيد'
   });
 };
 /**
@@ -90,15 +110,15 @@ exports.getLogin = function (req, res) {
 exports.postLogin = function (req, res, next) {
   var validationErrors = [];
   if (!validator.isEmail(req.body.email)) validationErrors.push({
-    msg: 'Please enter a valid email address.'
+    msg: 'الرجاء إدخال بريد إلكتروني صالح'
   });
   if (validator.isEmpty(req.body.password)) validationErrors.push({
-    msg: 'Password cannot be blank.'
+    msg: 'الرجاء إدخال كلمة المرور'
   });
 
   if (validationErrors.length) {
     req.flash('errors', validationErrors);
-    return res.redirect('/login');
+    return res.redirect(req.get('referer'));
   }
 
   req.body.email = validator.normalizeEmail(req.body.email, {
@@ -111,7 +131,7 @@ exports.postLogin = function (req, res, next) {
 
     if (!user) {
       req.flash('errors', info);
-      return res.redirect('/login');
+      return res.redirect(req.get('referer'));
     }
 
     req.logIn(user, function (err) {
@@ -120,9 +140,14 @@ exports.postLogin = function (req, res, next) {
       }
 
       req.flash('success', {
-        msg: 'Success! You are logged in.'
+        msg: 'Success! You are logged in'
       });
-      res.redirect(req.session.returnTo || '/');
+
+      if (user.isProvider) {
+        res.redirect('/providerDashboard');
+      }
+
+      res.redirect('/beneficiaryDashboard');
     });
   })(req, res, next);
 };
@@ -146,13 +171,45 @@ exports.logout = function (req, res) {
  */
 
 
-exports.getSignup = function (req, res) {
+exports.getSignupSwitch = function (req, res) {
   if (req.user) {
-    return res.redirect('/');
+    if (req.user.isProvider) {
+      return res.redirect('/providerDashboard');
+    }
+
+    return res.redirect('/beneficiaryDashboard');
   }
 
-  res.render('account/signup', {
-    title: 'Create Account'
+  res.render('registerSwitch', {
+    title: 'إنشاء حساب'
+  });
+};
+
+exports.getPSignup = function (req, res) {
+  if (req.user) {
+    if (req.user.isProvider) {
+      return res.redirect('/providerDashboard');
+    }
+
+    return res.redirect('/beneficiaryDashboard');
+  }
+
+  res.render('pRegister', {
+    title: 'إنشاء حساب مانح'
+  });
+};
+
+exports.getBSignup = function (req, res) {
+  if (req.user) {
+    if (req.user.isProvider) {
+      return res.redirect('/providerDashboard');
+    }
+
+    return res.redirect('/beneficiaryDashboard');
+  }
+
+  res.render('bRegister', {
+    title: 'إنشاء حساب مستفيد'
   });
 };
 /**
@@ -161,23 +218,23 @@ exports.getSignup = function (req, res) {
  */
 
 
-exports.postSignup = function (req, res, next) {
+exports.postPSignup = function (req, res, next) {
   var validationErrors = [];
   if (!validator.isEmail(req.body.email)) validationErrors.push({
-    msg: 'Please enter a valid email address.'
+    msg: 'الرجاء إدخال بريد صالح'
   });
   if (!validator.isLength(req.body.password, {
     min: 8
   })) validationErrors.push({
-    msg: 'Password must be at least 8 characters long'
+    msg: 'كلمة المرور يجب أن تتكون من ٨ خانات'
   });
   if (req.body.password !== req.body.confirmPassword) validationErrors.push({
-    msg: 'Passwords do not match'
+    msg: 'الرجاء مطابقة كلمات المرور'
   });
 
   if (validationErrors.length) {
     req.flash('errors', validationErrors);
-    return res.redirect('/signup');
+    return res.redirect('/providerSignup');
   }
 
   req.body.email = validator.normalizeEmail(req.body.email, {
@@ -185,7 +242,8 @@ exports.postSignup = function (req, res, next) {
   });
   var user = new User({
     email: req.body.email,
-    password: req.body.password
+    password: req.body.password,
+    isProvider: true
   });
   User.findOne({
     email: req.body.email
@@ -196,9 +254,9 @@ exports.postSignup = function (req, res, next) {
 
     if (existingUser) {
       req.flash('errors', {
-        msg: 'Account with that email address already exists.'
+        msg: 'البريد الإلكتروني مستعمل مسبقًا'
       });
-      return res.redirect('/signup');
+      return res.redirect('/providerSignup');
     }
 
     user.save(function (err) {
@@ -211,7 +269,64 @@ exports.postSignup = function (req, res, next) {
           return next(err);
         }
 
-        res.redirect('/');
+        res.redirect('/providerDashboard');
+      });
+    });
+  });
+};
+
+exports.postBSignup = function (req, res, next) {
+  var validationErrors = [];
+  if (!validator.isEmail(req.body.email)) validationErrors.push({
+    msg: 'الرجاء إدخال بريد صالح'
+  });
+  if (!validator.isLength(req.body.password, {
+    min: 8
+  })) validationErrors.push({
+    msg: 'كلمة المرور يجب أن تتكون من ٨ خانات'
+  });
+  if (req.body.password !== req.body.confirmPassword) validationErrors.push({
+    msg: 'الرجاء مطابقة كلمات المرور'
+  });
+
+  if (validationErrors.length) {
+    req.flash('errors', validationErrors);
+    return res.redirect('/beneficiarySignup');
+  }
+
+  req.body.email = validator.normalizeEmail(req.body.email, {
+    gmail_remove_dots: false
+  });
+  var user = new User({
+    email: req.body.email,
+    password: req.body.password,
+    isProvider: false
+  });
+  User.findOne({
+    email: req.body.email
+  }, function (err, existingUser) {
+    if (err) {
+      return next(err);
+    }
+
+    if (existingUser) {
+      req.flash('errors', {
+        msg: 'البريد الإلكتروني مستعمل مسبقًا'
+      });
+      return res.redirect('/beneficiarySignup');
+    }
+
+    user.save(function (err) {
+      if (err) {
+        return next(err);
+      }
+
+      req.logIn(user, function (err) {
+        if (err) {
+          return next(err);
+        }
+
+        res.redirect('/beneficiaryDashboard');
       });
     });
   });
