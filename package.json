@@ -1,15 +1,13 @@
-{
+{https://github.com/Lamees17/social-investment-platform/blob/master/package.json
   "name": "hackathon-starter",
   "version": "6.1.0",
   "description": "A boilerplate for Node.js web applications",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sahat/hackathon-starter.git"
+   
   },
   "license": "MIT",
-  "author": "Sahat Yalkabov",
-  "contributors": [
-    "Yashar Fakhari (https://github.com/YasharF)"
+ 
   ],
   "scripts": {
     "postinstall": "npm rebuild node-sass",
